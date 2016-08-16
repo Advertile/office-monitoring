@@ -1,0 +1,6 @@
+---
+
+pi_password: '...'
+
+# Example: http://<hostname>/#/dashboard/demo?embed=true&_g=(time:(from:now-90d,mode:quick,to:now),title:demo)
+monitoring_url: '...'

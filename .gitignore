@@ -1,3 +1,4 @@
 /configuration/ssh/known_hosts
 /provisioners/ansible/setup-playbook.retry
-provisioners/shell/files/etc/wpa_supplicant/wpa_supplicant.conf
+/provisioners/shell/files/etc/wpa_supplicant/wpa_supplicant.conf
+/provisioners/ansible/group_vars/all

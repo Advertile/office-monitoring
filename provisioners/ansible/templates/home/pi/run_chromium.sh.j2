@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Example: http://<hostname>/#/dashboard/demo?embed=true&_g=(time:(from:now-90d,mode:quick,to:now),title:demo)
+monitoring_url='{{ monitoring_url }}'
+user_data_directory=~/.chromium_temp_dir
+
+rm -rf $user_data_directory
+chromium-browser --no-first-run --kiosk --incognito --disable-translate --user-data-dir=$user_data_directory $monitoring_url

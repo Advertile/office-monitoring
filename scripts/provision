@@ -1,0 +1,13 @@
+#!/bin/bash
+
+script_directory="$( cd "$( dirname "$0" )" && pwd )"
+project_directory=$script_directory/..
+
+docker run -it --rm \
+           --name=pi-monitoring \
+           --volume=$project_directory/provisioners/ansible:/ansible \
+           --volume=$project_directory/configuration/ssh/known_hosts:/root/.ssh/known_hosts \
+           --volume=$HOME/.ssh/raspberry-pi.pub:/root/.ssh/raspberry-pi.pub:ro \
+           --workdir=/ansible \
+           --entrypoint=bash \
+           williamyeh/ansible:debian8

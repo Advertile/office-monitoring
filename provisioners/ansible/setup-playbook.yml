@@ -1,0 +1,130 @@
+---
+
+- hosts: all
+  tasks:
+    - name: Change hostname
+      hostname:
+        name: monitoring
+
+    - name: Copy SSH key
+      authorized_key:
+        user: pi
+        key: "{{ lookup('file', '~/.ssh/raspberry-pi.pub') }}"
+        manage_dir: yes
+        state: present
+
+    - name: Update APT package cache
+      apt:
+        update_cache: yes
+
+    - name: Install useful software
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      with_items:
+        - curl
+        - wget
+        - vim
+        - tree
+        - htop
+        - screen
+        - git
+
+- hosts: all
+  vars:
+    chromium_version: 48.0.2564.82
+    ubuntu_version: 15.04.1.1193
+  tasks:
+    # --- Install Chromium Browser ---
+    - name: Download chromium packages
+      get_url:
+        url: "http://ports.ubuntu.com/pool/universe/c/chromium-browser/{{ item }}"
+        dest: /home/pi/Downloads/
+        owner: pi
+        group: pi
+      with_items:
+        - "chromium-codecs-ffmpeg-extra_{{ chromium_version }}-0ubuntu0.{{ ubuntu_version }}_armhf.deb"
+        - "chromium-browser_{{ chromium_version }}-0ubuntu0.{{ ubuntu_version }}_armhf.deb"
+        - "chromium-browser-l10n_{{ chromium_version }}-0ubuntu0.{{ ubuntu_version }}_all.deb"
+
+    - name: Install chromium packages
+      apt:
+        deb: "/home/pi/Downloads/{{ item }}"
+      with_items:
+        - "chromium-codecs-ffmpeg-extra_{{ chromium_version }}-0ubuntu0.{{ ubuntu_version }}_armhf.deb"
+        - "chromium-browser_{{ chromium_version }}-0ubuntu0.{{ ubuntu_version }}_armhf.deb"
+        - "chromium-browser-l10n_{{ chromium_version }}-0ubuntu0.{{ ubuntu_version }}_all.deb"
+    # --- END: Install Chromium Browser ---
+
+    # Resource: https://lescinskas.lt/blog/2015/11/29/raspberry-pi-monitoring-screens/
+    - name: Install required software for kiosk mode
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      with_items:
+        - unclutter
+        - xscreensaver
+
+    - name: Disable screensaver
+      copy:
+        src: home/pi/.xscreensaver
+        dest: /home/pi/.xscreensaver
+        owner: pi
+        group: pi
+
+    - name: Disable mouse cursor
+      lineinfile:
+        dest: /home/pi/.config/lxsession/LXDE-pi/autostart
+        state: present
+        line: unclutter -idle 1 -root
+
+    - name: Create the chromium start script
+      template:
+        src: home/pi/run_chromium.sh.j2
+        dest: /home/pi/run_chromium.sh
+        owner: pi
+        group: pi
+        mode: 0740
+
+    - name: Enable Chromium autostart
+      lineinfile:
+        dest: /home/pi/.config/lxsession/LXDE-pi/autostart
+        state: present
+        line: "@/home/pi/run_chromium.sh"
+
+- hosts: all
+  tasks:
+    - name: Make it more secure
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        state: present
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      with_items:
+        # Disable root user login
+        - regexp: '^#*\s*PermitRootLogin'
+          line: PermitRootLogin no
+      notify:
+        - restart_ssh_daemon
+
+    - name: Change user password
+      user:
+        name: pi
+        password: "{{ pi_password }}"
+
+    - name: Upgrade APT to the lastest packages
+      apt:
+        upgrade: safe
+
+    - name: Expand root file system
+      shell: /usr/bin/raspi-config --expand-rootfs >> /var/log/raspi-config--expand-rootfs
+      args:
+        creates: /raspi-config--expand-rootfs
+
+    - name: Reboot
+      command: /sbin/shutdown -r now "Ansible updates triggered"
+      async: 0
+      poll: 0
+      ignore_errors: true
