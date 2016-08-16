@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Resources:
+# - https://www.raspberrypi.org/documentation/installation/installing-images/linux.md
+
+script_directory="$( cd "$( dirname "$0" )" && pwd )"
+project_directory=$script_directory/..
+
+echo -e "Enter data mount directory name followed by [ENTER]:"
+read data_mount_path
+
+# ---
+# Copy WiFi files
+
+network_directory_path="$data_mount_path/etc/network"
+if [ -d $network_directory_path ]; then
+  echo "Network directory ($network_directory_path) exists"
+  echo "Copy file"
+
+  sudo cp $project_directory/provisioners/shell/files/etc/network/interfaces $network_directory_path/interfaces
+else
+  echo "Network directory ($network_directory_path) doesn't exist"
+
+  exit -1
+fi
+
+wpa_directory_path="$data_mount_path/etc/wpa_supplicant"
+if [ -d $wpa_directory_path ]; then
+  echo "Network directory ($wpa_directory_path) exists"
+  echo "Copy file"
+
+  sudo cp $project_directory/provisioners/shell/files/etc/wpa_supplicant/wpa_supplicant.conf $wpa_directory_path/wpa_supplicant.conf
+else
+  echo "WPA directory ($wpa_directory_path) doesn't exist"
+
+  exit -1
+fi
