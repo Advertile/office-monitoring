@@ -14,7 +14,11 @@ The goal of this repository is to setup monitoring inside your office (based on 
 - HDMI cable
 - SSH keys located in `~/.ssh/raspberry-pi` and `~/.ssh/raspberry-pi.pub`
 
-## Setup
+## Hardware Setup
+
+![Office monitoring Raspberry Pi instructions](https://github.com/Advertile/office-monitoring/blob/master/documentation/images/instructions.png "Office monitoring Raspberry Pi instructions")
+
+## Software Setup
 
 ### Prepare micro SD card
 
