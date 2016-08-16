@@ -30,7 +30,7 @@ In this chapter you will prepare the micro SD card used by the Raspberry Pi. Aft
 
   On Ubuntu use the Disks utility.
 
-- Create and adjust WiFi configuration file:
+- Create and adjust WiFi [configuration file](provisioners/shell/files/etc/wpa_supplicant/wpa_supplicant.conf.example):
 
   ```
   cp provisioners/shell/files/etc/wpa_supplicant/wpa_supplicant.conf.example provisioners/shell/files/etc/wpa_supplicant/wpa_supplicant.conf
@@ -59,7 +59,7 @@ In this chapter you will prepare the micro SD card used by the Raspberry Pi. Aft
 
 This chapter describes how to install the chromium browser in "kiosk" mode.
 
-- Create and adjust the variables:
+- Create and adjust variables in the [`group_vars/all` file](provisioners/ansible/group_vars/all.example):
 
   ```
   cp provisioners/ansible/group_vars/all.example provisioners/ansible/group_vars/all
